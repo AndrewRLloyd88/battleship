@@ -1,6 +1,10 @@
 .rows {
 }
 
+main {
+  display: flex;
+}
+
 .rows div {
   border: 1px solid black;
   width: 100px;
