@@ -1,0 +1,19 @@
+.rows {
+}
+
+.rows div {
+  border: 1px solid black;
+  width: 100px;
+}
+
+.columns {
+  display: flex;
+}
+
+.battleship-container {
+  display: flex;
+}
+
+div {
+  border: 1px solid;
+}
