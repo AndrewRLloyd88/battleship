@@ -17,3 +17,32 @@
 div {
   border: 1px solid;
 }
+
+/* A Carrier, which is 5 tiles long */
+
+.carrier {
+  background-color: purple;
+}
+
+/* A Battleship, which is 4 tiles long */
+
+.battleship {
+  background-color: blue;
+}
+
+/* A Cruiser, which is 3 tiles long */
+
+.cruiser {
+  background-color: green;
+}
+
+/* A Submarine, which is 3 tiles long */
+
+.submarine {
+  background-color: yellow;
+}
+
+/* A Destroyer, which is 2 tiles long */
+.destroyer {
+  background-color: red;
+}
