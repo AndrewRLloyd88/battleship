@@ -50,3 +50,11 @@ div {
 .destroyer {
   background-color: red;
 }
+
+.hidden {
+  display: none;
+}
+
+.highlight {
+  background-color: yellowgreen;
+}
