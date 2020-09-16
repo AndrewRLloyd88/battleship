@@ -79,7 +79,7 @@ $(document).ready(() => {
   //READY PHASE - The player will pick where their 5 ships need to be on the board
 
   //listen for what ships the player wants to pick
-  $currentShipsToPlace.change(function() {
+  $currentShipsToPlace.change(function () {
     // console.log($(this).val())
     //Any time a different ship is picked we need to update this from the form value
     $currentSelectedShip = $(this).val().toLowerCase();
@@ -96,7 +96,7 @@ $(document).ready(() => {
 
 
   //listening for a player to click for any particular ship
-  $addShip.click(function(evt) {
+  $addShip.click(function (evt) {
     // I am going to do the player selection based on Starting Point, Ending Point
     // has the player already placed this ship
     if (playersPlacedShips[`${$currentSelectedShip}`] === true) {
@@ -121,7 +121,9 @@ $(document).ready(() => {
       //we need to set the switch on to indicate we are placing a ship
       isPlacingShip = true;
       //we need to calculate end placements
+      console.log("logging endpoints before: ", endPoints)
       endPoints = calculateEndPlacements(startPoint, shipSize, playersShipsPos);
+      console.log("I MUST LOG OUT THE ENDPOINTS: ", endPoints);
       // console.log("in click: ", endPoints)
       renderEndPlacements(endPoints);
       //show cancel button
@@ -187,7 +189,7 @@ $(document).ready(() => {
     let newEndpoint = [];
     shipSize = shipSize - 1;
 
-    const existingPlacements = [];
+
     //we can base our end placements off the ship size the starting point and determine the end point
     // console.log(typeof startPoint);
     // console.log(startX, startY);
@@ -196,14 +198,6 @@ $(document).ready(() => {
     // could we put all of these actions in a loop to lose the repetitive code?
     //consider using helper functions and passing the values via these?
 
-
-    //does it intersect with another ship
-    for (const ships in playersShipsPos) {
-      existingPlacements.push(...playersShipsPos[ships]);
-    }
-    console.log("intersection check: ", existingPlacements);
-
-    //will the selected place intersect with another ship
 
     //check X+
     if (defaultStartX + shipSize > 9) {
@@ -262,7 +256,13 @@ $(document).ready(() => {
       newEndpoint.push(`${defaultStartX},${negStartY}`);
     }
     // console.log(newEndpoint);
-    return newEndpoint;
+
+    //will the selected place intersect with another ship
+    return checkEndsNotIntersect(newEndpoint, playersShipsPos);
+    // console.log(newEndpoint)
+
+
+    // return newEndpoint;
   };
 
   //renders the highlights on the board showing where the legal endpoints are
@@ -377,11 +377,147 @@ $(document).ready(() => {
     }
   };
 
+  //we must use logic similar to addShipToArray to check if a path would intersect
+  const checkEndsNotIntersect = (newEndpoint, playersShipsPos) => {
+    const existingPlacements = [];
+    let newEndPoints = [];
+    const bannedPoints = [];
+    //can we detect if our predicted placements would intersect with an existing ship
+    for (const ships in playersShipsPos) {
+      existingPlacements.push(...playersShipsPos[ships]);
+    }
+    console.log("intersection check: ", existingPlacements);
+    //used to count back to our starting pos
+    const currentPos = existingPlacements[existingPlacements.length - 1]
+    console.log("currentPos: ", currentPos);
 
-  // 11:47
-  // and so in the "play" phase we could say when player clicks one square go through each ship and check each array if the input class [0,0] is included in any array
-  // 11:48
-  // if its included
+    //stop the user placing an endpoint on another ship? - not working yet
+    if (existingPlacements.includes(currentPos)) {
+      console.log("don't place the end of your ship on another ship");
+    }
+
+    if(existingPlacements.length > 1) {
+      console.log("STARTO")
+    for (const coords of newEndpoint) {
+      const x = coords[0]
+      const y = coords[2]
+      console.log("in checkEndsNotInterSect: ", x, y)
+      const cdelete = `${coords}`
+      //check UP from BOTTOM of Board if a suggested path would clip our ships
+      // if(existingPlacements.includes(coords)){
+      //   newEndpoint.pop(coords);
+      // }
+      //check a suggested endpoint doesnt allow a placement to clip an existing ship
+      //Check Up from endpoint to startpoint
+      //we may need conditionals here?? e.g. if 5,3 < 5,6
+      if (y > currentPos[2]) {
+        for (let i = y; i > currentPos[2]; i--) {
+          console.log(`in our loop: "${currentPos[0]},${i}"`)
+          //does the countback check
+          if (existingPlacements.includes(`${currentPos[0]},${i}`)) {
+            //pop the coords from endpoint
+            //  newEndpoint.pop(coords);
+            //push the banned points to coords
+            bannedPoints.push(coords);
+            console.log("bannedpoints: ", bannedPoints)
+            console.log("newEndPoints: ", newEndPoints)
+            console.log("coords: ", cdelete)
+            console.log(newEndpoint.indexOf(cdelete))
+            console.log("I SHOULD BE POPPING THIS: ", `"${coords}"`)
+            console.log("newEndPoints: ", newEndPoints)
+            console.log("overlap counting up")
+          }
+        }
+      }
+
+      if (y < currentPos[2]) {
+        const index = newEndpoint.indexOf(coords)
+        //Check DOWN from TOP OF BOARD if a path would clip our existing ships
+        for (let i = y; i < currentPos[2]; i++) {
+          console.log(`in our loop: "${currentPos[0]},${i}"`)
+          //does the countback check
+          if (existingPlacements.includes(`${currentPos[0]},${i}`)) {
+            bannedPoints.push(coords)
+            console.log("bannedpoints: ", bannedPoints)
+            //pop the coords from endpoint
+            console.log("newEndPoints: ", newEndPoints)
+            console.log(typeof cdelete)
+            console.log("coords: ", cdelete)
+            console.log(newEndpoint.indexOf(coords))
+            console.log("I SHOULD BE POPPING THIS: ", `"${coords}"`)
+            console.log("newEndPoints: ", newEndPoints)
+            console.log("overlap counting down")
+
+          }
+        }
+      }
+
+      //Check Right to Left
+      if (x > currentPos[0]) {
+        const index = newEndpoint.indexOf(coords)
+        //Check RIGHT to LEFT OF BOARD if a path would clip our existing ships
+        for (let i = x; i > currentPos[0]; i--) {
+          console.log(`in our loop right to right?: "${i},${currentPos[2]}"`)
+          //does the countback check
+          if (existingPlacements.includes(`${i},${currentPos[2]}`)) {
+            bannedPoints.push(coords);
+            console.log("bannedpoints: ", bannedPoints)
+            console.log("I SHOULD BE POPPING THIS: ", `"${coords}"`)
+            //pop the coords from endpoint
+            console.log(newEndPoints)
+            newEndPoints = newEndpoint.filter((item) => item !== cdelete)
+            // newEndpoint.pop(coords);
+            console.log("newEndPoints: ", newEndPoints)
+            console.log("overlap counting right to left")
+          }
+        }
+      }
+    
+      //Check Left
+
+      if (x < currentPos[0]) {
+        const index = newEndpoint.indexOf(coords)
+        //Check RIGHT to LEFT OF BOARD if a path would clip our existing ships
+        for (let i = x; i < currentPos[0]; i++) {
+          console.log(`in our loop right to right?: "${i},${currentPos[2]}"`)
+          //does the countback check
+          if (existingPlacements.includes(`${i},${currentPos[2]}`)) {
+            bannedPoints.push(coords);
+            console.log("bannedpoints: ", bannedPoints)
+            console.log("I SHOULD BE POPPING THIS: ", cdelete)
+            //pop the coords from endpoint
+            console.log(newEndPoints)
+            newEndPoints = newEndpoint.filter((item) => item !== cdelete)
+            // newEndpoint.pop(coords);
+            console.log("newEndPoints: ", newEndPoints)
+            console.log("overlap counting right to left")
+          }
+        }
+      }
+
+
+
+
+
+
+
+    }
+    
+    newEndPoints = newEndpoint.filter( ( el ) => !bannedPoints.includes( el ) );
+
+
+
+    return newEndPoints;
+  }
+
+    return newEndpoint;
+
+  }
+
+
+
+
+
 
 
 
