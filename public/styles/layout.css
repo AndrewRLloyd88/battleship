@@ -1,24 +1,19 @@
-.rows {
-}
-
-main {
-  display: flex;
-}
-
 .rows div {
   border: 1px solid black;
   width: 100px;
+  height: 2rem;
 }
 
-.columns {
-  display: flex;
+.padding {
+padding: 7px;
 }
+
 
 .battleship-container {
   display: flex;
 }
 
-div {
+.battleship-container div {
   border: 1px solid;
 }
 
@@ -57,4 +52,20 @@ div {
 
 .highlight {
   background-color: yellowgreen;
+}
+
+.midBoard {
+  width: 500px;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  padding: 0 1em;
+  
+}
+
+.container {
+width: 90%;
+margin: 0 auto;
+display: flex;
 }
