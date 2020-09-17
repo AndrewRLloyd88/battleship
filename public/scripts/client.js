@@ -92,12 +92,22 @@ $(document).ready(() => {
   });
 
 
+  $cancelButton.click(function (evt) {
+    console.log("cancel");
+    cancelPlacement(startPoint, endPoints, playersShipsPos, $currentSelectedShip);
+  })
+
   //listening for a player to click for any particular ship
   $addShip.click(function (evt) {
     // I am going to do the player selection based on Starting Point, Ending Point
     // has the player already placed this ship
     if (playersPlacedShips[`${$currentSelectedShip}`] === true) {
       $warning.text("You have already placed this ship");
+      return;
+    }
+
+    if (!checkNotOverlapping(playersShipsPos, evt)) {
+      $warning.text("Please don't place your ship on top of another ship");
       return;
     }
     //is the player placing a ship?
@@ -144,7 +154,10 @@ $(document).ready(() => {
         playersPlacedShips[`${$currentSelectedShip}`] = true;
         console.log(playersPlacedShips);
         isPlacingShip = false;
+        //show our form again
         $currentShipsToPlace.removeClass('hidden');
+        //make our cancel button hidden
+        $cancelButton.addClass("hidden");
       }
     }
   });
@@ -406,8 +419,33 @@ $(document).ready(() => {
     return newEndpoint;
   }
 
+  //check a placement isn't being placed on top of another ship
+  const checkNotOverlapping = (playersShipsPos, evt) => {
+    const existingPlacements = []
+    //get all of our existing coordinates
+    for (const ships in playersShipsPos) {
+      //get our current ships placements to test against
+      existingPlacements.push(...playersShipsPos[ships]);
+    }
 
+    if (existingPlacements.includes(evt.target.id)) {
+      return false;
+    }
+    return true;
+  };
 
+  const cancelPlacement = (startPoint, endPoints, playersShipsPos, $currentSelectedShip) => {
+    removeEndPlacements(endPoints);
+    $(`#${startPoint[0]}\\,${startPoint[2]}`).removeClass()
+    playersShipsPos[$currentSelectedShip] = []
+    isPlacingShip = false;
+    startPoint = "";
+    endPoints = [];
+    //show our form again
+    $currentShipsToPlace.removeClass('hidden');
+    //make our cancel button hidden
+    $cancelButton.addClass("hidden");
+  }
 
 
 
