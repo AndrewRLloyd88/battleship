@@ -88,13 +88,32 @@ $(document).ready(() => {
     //update our warning text message to user
     $warning.text("Please place your " + $currentSelectedShip);
 
-    //we need some logic to stop this from being selected upon a placement/bar illegal placements later
+    //logic to check if the remove button needs to be hidden or not
+    if(playersPlacedShips[`${$currentSelectedShip}`] === true){
+      $moveShip.removeClass('hidden')
+      $warning.text("Click Move Ship to re-place your " + $currentSelectedShip);
+    } else {
+      $moveShip.addClass('hidden')
+      $warning.text("Please place your " + $currentSelectedShip);
+    }
+
   });
 
-
+//cancel button logic
   $cancelButton.click(function (evt) {
     console.log("cancel");
     cancelPlacement(startPoint, endPoints, playersShipsPos, $currentSelectedShip);
+    $warning.text("Please place your " + $currentSelectedShip);
+  })
+
+  //move ship logic
+  $moveShip.click(function(evt) {
+    //run our changePlacement function that undoes the entire placement
+  changePlacement(playersShipsPos, $currentSelectedShip);
+  //make the remove button hidden
+  $(this).addClass("hidden")
+  //change our warning text back to something appropriate
+  $warning.text("Please place your " + $currentSelectedShip);
   })
 
   //listening for a player to click for any particular ship
@@ -434,6 +453,7 @@ $(document).ready(() => {
     return true;
   };
 
+  //functionality for if the player changes mind during ship placement
   const cancelPlacement = (startPoint, endPoints, playersShipsPos, $currentSelectedShip) => {
     removeEndPlacements(endPoints);
     $(`#${startPoint[0]}\\,${startPoint[2]}`).removeClass()
@@ -445,6 +465,26 @@ $(document).ready(() => {
     $currentShipsToPlace.removeClass('hidden');
     //make our cancel button hidden
     $cancelButton.addClass("hidden");
+  }
+
+  //functionality for the edit ship
+  const changePlacement = (playersShipsPos, $currentSelectedShip) => {
+    console.log("hey im in changePlacement");
+    //check where the starting coords are
+    console.log(playersShipsPos[`${$currentSelectedShip}`]);
+    //pull out the shipToEdit's array
+    const shipToDelete = playersShipsPos[`${$currentSelectedShip}`];
+    //loop through and remove all classes on squares that paint the ship
+    for (const coords of shipToDelete) {
+      console.log(coords);
+      $(`#${coords[0]}\\,${coords[2]}`).removeClass(`${$currentSelectedShip}`);
+    }
+    //set our coords for this ship back to an empty array
+    playersShipsPos[`${$currentSelectedShip}`] = [];
+    //set our placedShip bool back to false as its now not placed
+    playersPlacedShips[`${$currentSelectedShip}`] = false;
+    console.log(playersShipsPos)
+    return;
   }
 
 
